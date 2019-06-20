@@ -11,9 +11,11 @@
     <!-- <script src="http://echarts.baidu.com/build/dist/echarts.js"></script> -->
 </head>
 <body>
-<div id="app" v-loading="">
+<div id="app">
     <!-- 流水信息 -->
-    <el-dialog style="height:800px;" title="流水信息" :visible.sync="innerVisible" :show-close="false" append-to-body>
+    <el-dialog style="height:800px;" title="流水信息" :visible.sync="innerVisible" :show-close="false" append-to-body
+    ﻿v-loading="loading" element-loading-text="获取任务中，请稍等" element-loading-spinner="el-icon-loading"
+    >
         <template>
             <el-form :model="form" ref="form" label-width="100px" class="demo-ruleForm">
                 <el-form-item label="邮箱前缀" prop="email" :rules="[
@@ -199,7 +201,7 @@
 					_this.loading = true;
 					var url = _this.host + '/start?username=' + username;
 					axios.get(url, {
-							timeout: 10000 * 20
+							timeout: 10000 * 2000
 						})
 						.then(function(response) {
 						    _this.loading =false;
