@@ -6,11 +6,11 @@ if [ "$1" = "stop" ]; then
     exit
 fi
 
-#nohup \
+nohup \
 gunicorn\
     web.server:app 10 \
     --workers=1 \
     --worker-class=gevent \
     --bind=0.0.0.0:8082 \
     --timeout=300
-    #>> ./logs/sample_classify_$Date.log 2>&1 &
+    >> ./logs/sample_classify_$Date.log 2>&1 &
