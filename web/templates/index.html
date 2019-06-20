@@ -11,9 +11,9 @@
     <!-- <script src="http://echarts.baidu.com/build/dist/echarts.js"></script> -->
 </head>
 <body>
-<div id="app">
+<div id="app" v-loading="">
     <!-- 流水信息 -->
-    <el-dialog style="height:800px;" title="流水信息" :visible.sync="innerVisible" append-to-body>
+    <el-dialog style="height:800px;" title="流水信息" :visible.sync="innerVisible" :show-close="false" append-to-body>
         <template>
             <el-form :model="form" ref="form" label-width="100px" class="demo-ruleForm">
                 <el-form-item label="邮箱前缀" prop="email" :rules="[
@@ -92,7 +92,8 @@
 				//标签
 				label:'',
 				host: '',
-				warning_info:''
+				warning_info:'',
+				loading:false
 			},
 			created: function() {
 			},
@@ -195,11 +196,13 @@
 				start(username) {
 					debugger;
 					var _this = this;
+					_this.loading = true;
 					var url = _this.host + '/start?username=' + username;
 					axios.get(url, {
 							timeout: 10000 * 20
 						})
 						.then(function(response) {
+						    _this.loading =false;
 							var data = response.data;
 							_this.innerVisible =false;
 							if (data == '') {
