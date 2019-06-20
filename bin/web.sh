@@ -7,9 +7,10 @@ if [ "$1" = "stop" ]; then
 fi
 
 #nohup \
-gunicorn web.server:app \
+gunicorn\
+    web.server:app 10 \
     --workers=1 \
     --worker-class=gevent \
-    --bind=0.0.0.0:8080 \
+    --bind=0.0.0.0:8082 \
     --timeout=300
-#>> ./logs/sample_classify_$Date.log 2>&1 &
+    #>> ./logs/sample_classify_$Date.log 2>&1 &

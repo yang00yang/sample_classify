@@ -7,7 +7,7 @@ from main import sample
 from main import check
 import json
 app = Flask(__name__,root_path="web")
-person_img_num = 0
+person_img_num = 10
 
 logger = logging.getLogger("WebServer")
 
@@ -56,6 +56,4 @@ def img_check():
 
 
 if __name__ == '__main__':
-    if len(sys.argv) >= 1:
-        person_img_num = int(sys.argv[1])
-    app.run(debug=True, port=8080)
+    app.run(debug=True, port=8082)
