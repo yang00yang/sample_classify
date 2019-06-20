@@ -7,7 +7,7 @@ from main import sample
 from main import check
 import json
 app = Flask(__name__,root_path="web")
-person_img_num = 2000
+person_img_num = 10
 logger = logging.getLogger("WebServer")
 lock = threading.Lock()
 
@@ -40,11 +40,11 @@ def start():
         t = MyThread()
         t.start()
     # 已经有任务,获取第一张图片
-    img_path,label = check.get_img_in_src(username)
+    img_path,label,remain = check.get_img_in_src(username)
     if img_path == '' or label == '':
         return ''
     img_stream = return_img_stream(img_path)
-    return jsonify({'img_stream': str(img_stream),'img_path':img_path,'label':label})
+    return jsonify({'img_stream': str(img_stream),'img_path':img_path,'label':label,'remain':remain})
 
 class MyThread(threading.Thread):
     def run(self):
@@ -60,7 +60,7 @@ def img_check():
     type = request.json.get('type')
     img_path = request.json.get('img_path')
     check.move_img_good_or_bad(username,type,img_path)
-    return "ok"
+    return 'ok'
 
 
 if __name__ == '__main__':

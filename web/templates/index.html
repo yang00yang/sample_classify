@@ -1,4 +1,5 @@
-﻿﻿<html>
+﻿﻿
+<html>
 <head>
     <meta charset="UTF-8">
     <!-- import CSS -->
@@ -14,8 +15,7 @@
 <div id="app">
     <!-- 流水信息 -->
     <el-dialog style="height:800px;" title="流水信息" :visible.sync="innerVisible" :show-close="false" append-to-body
-    ﻿v-loading="loading" element-loading-text="获取任务中，请稍等" element-loading-spinner="el-icon-loading"
-    >
+               ﻿v-loading="loading" element-loading-text="获取任务中，请稍等" element-loading-spinner="el-icon-loading">
         <template>
             <el-form :model="form" ref="form" label-width="100px" class="demo-ruleForm">
                 <el-form-item label="邮箱前缀" prop="email" :rules="[
@@ -30,46 +30,69 @@
             </el-form>
         </template>
     </el-dialog>
-    <el-header style="text-align: right; font-size: 12px;border-bottom: 1px solid #e5e5e5">
-        <el-row>
-            <el-col :span="2"></el-col>
-            <el-col :span="8">
-                <div class="title-font">样本人工清理</div>
-            </el-col>
-            <el-col :span="2"></el-col>
-        </el-row>
-    </el-header>
-    ﻿
-    <template v-if="img_base64!=''&&warning_info==''">
-        <el-row>
-            <el-col :span="12">
-                <div class="group-class">任务图片:</div>
-            </el-col>
-            <el-col :span="8">
-                <div class="group-class">预测结果:<p v-html="label"></p></div>
-            </el-col>
-        </el-row>
-        <div class="demo-image__placeholder">
-            <div class="block">
-                <img class="img_class" style="width:600px" :src="img_base64">
-            </div>
-        </div>
-		<el-row ﻿style="margin-top:60px ;margin-left:60px">
-			<el-col :span="5">
-			    <el-button type="primary" icon="el-icon-check" @click="check_image('good')">正确</el-button>
-			</el-col>
-			<el-col :span="6">
-			    <el-button type="primary" icon="el-icon-close" @click="check_image('bad')">错误</el-button>
-			</el-col>
-		</el-row>
-    </template>
-    <template>
-        <el-row>
-            <el-col :span="12">
-                <div class="group-class"><p v-html="warning_info"></p></div>
-            </el-col>
-        </el-row>
-    </template>
+    <el-container>
+        <el-header style="text-align: right; font-size: 12px;border-bottom: 1px solid #e5e5e5">
+            <el-row>
+                <el-col :span="2"></el-col>
+                <el-col :span="8">
+                    <div class="title-font">样本人工清理</div>
+                </el-col>
+                <el-col :span="2">
+                    <div class="title-font">剩余</div>
+                </el-col>
+                <el-col :span="1">
+                    <div v-html="remain" class="title-font2"></div>
+                </el-col>
+                <el-col :span="2">
+                    <div class="title-font">张图片</div>
+                </el-col>
+
+            </el-row>
+        </el-header>
+        ﻿
+        <el-main>
+            <template v-if="img_base64!=''&&warning_info==''">
+                <el-row>
+                    <el-col :span="15">
+                        <div class="group-class">任务图片:</div>
+                        <div class="demo-image__placeholder">
+                            <div class="block">
+                                <img class="img_class" style="width:600px" :src="img_base64">
+                            </div>
+                        </div>
+                    </el-col>
+                    <el-col :span="8">
+                        <div class="group-class">预测结果:<p v-html="label"></p>
+                            <el-button type="primary" icon="el-icon-check" @click="check_image('good')">正确</el-button>
+                            <el-button type="primary" icon="el-icon-close" @click="check_image('bad')">错误</el-button>
+                        </div>
+                        <div class="group-class">
+                            <el-alert
+                                    title="样本过滤说明"
+                                    type="success"
+                                    effect="dark"
+                                    description="1.匹配完全正确才算正确，模棱两可或者字数不全的都为错误。2.预计需要2小时，可以关闭，下次继续。3。辛苦辛苦"
+                                    show-icon>
+                            </el-alert>
+                        </div>
+                    </el-col>
+                </el-row>
+
+            </template>
+            <template>
+                <el-row>
+                    <el-col :span="12">
+                        <div class="group-class">
+                            <p v-html="warning_info"></p>
+                        </div>
+                    </el-col>
+                </el-row>
+            </template>
+        </el-main>
+        <el-footer>
+
+        </el-footer>
+        <el-container>
 </div>
 </body>
 
@@ -88,17 +111,18 @@
 					email: ''
 				},
 				//图片base64
-				img_base64:'',
+				img_base64: '',
 				//图片路径
-				img_src:'',
+				img_src: '',
 				//标签
-				label:'',
+				label: '',
 				host: '',
-				warning_info:'',
-				loading:false
+				warning_info: '',
+				loading: false,
+				//剩余文件数
+				remain:''
 			},
-			created: function() {
-			},
+			created: function() {},
 			filters: {
 
 			},
@@ -204,16 +228,17 @@
 							timeout: 10000 * 2000
 						})
 						.then(function(response) {
-						    _this.loading =false;
+							_this.loading = false;
 							var data = response.data;
-							_this.innerVisible =false;
+							_this.innerVisible = false;
 							if (data == '') {
-							_this.warning_info = '恭喜你，你的任务已完成'
+								_this.warning_info = '恭喜你，你的任务已完成'
 								return;
 							}
 							_this.img_base64 = "data:image/png;base64," + data.img_stream;
 							_this.img_src = data.img_path;
 							_this.label = data.label;
+							_this.remain = data.remain;
 						}).catch(() => {
 							_this.$message({
 								type: 'error',
@@ -230,7 +255,7 @@
 					var form = {
 						"type": type,
 						"img_path": img_src,
-						"username":email
+						"username": email
 					};
 					axios.post(_this.host + '/check', form, {
 							'Content-Type': 'application/json'
@@ -246,11 +271,10 @@
 								message: '选择失败'
 							});
 						});
-		﻿			}
+				}
 
 			}
 		})
-
 
 
 
@@ -277,6 +301,14 @@
 			font-size: 25px;
 		}
 
+		.title-font2 {
+			float: left;
+			font-family: Microsoft YaHei;
+			font-size: 30px;
+			text-align: center;
+			color:blue;
+		}
+
 		.group-class {
 			font-family: Microsoft YaHei;
 			font-size: 20px;
@@ -284,6 +316,19 @@
 			margin-left: 15px;
 			margin-bottom: 30px;
 		}
+
+
+		html, body {
+            height: 100%;
+            margin: 0;
+        }
+
+        ﻿.el-main {
+    background-color: #E9EEF3;
+    color: #333;
+    text-align: center;
+    line-height: 400px;
+  }
 
 
 

@@ -57,6 +57,7 @@ def move_img_good_or_bad(user_name,type,img_path):
             f_w.write(line)
     # 写入good或者bad文件夹中的txt
     write_label_to_newfile(label,user_name,type)
+    return len(lines)
 
 # 将label写入该用户的good文件夹或者bad文件夹
 def write_label_to_newfile(label,user_name,type):
@@ -83,14 +84,14 @@ def get_img_in_src(user_name):
     lines = img_txt.readlines()  # 读取所有行
     print("还剩" + str(len(lines)) + "行")
     if len(lines)-1 <= 0 :
-        return '',''
+        return '','',0
     first_line = lines[0].split()  # 取第一行
     print(str(lines[0]))
     img_name = first_line[0]
     label = first_line[1]
     # 图片
     img_path = img_name
-    return img_path,label
+    return img_path,label,len(lines)-1
 
 
 # 将label写入该用户的good文件夹或者bad文件夹
