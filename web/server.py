@@ -1,15 +1,15 @@
 #-*- coding:utf-8 -*-
 from flask import Flask,jsonify,request,render_template
 import base64,cv2,numpy as np,logging
-from threading import current_thread
-import os,sys
+import  threading
+import  time
 from main import sample
 from main import check
 import json
 app = Flask(__name__,root_path="web")
 person_img_num = 2000
-
 logger = logging.getLogger("WebServer")
+lock = threading.Lock()
 
 @app.route("/")
 def index():
@@ -33,17 +33,25 @@ def return_img_stream(img_local_path):
 # 开始任务
 @app.route('/start',methods=['GET'])
 def start():
+    global username
     username = request.args['username']
     if check.get_status(username) == 0:
         # 没有领任务
-        sample.get_img_by_person(person_img_num,username)
-
-    # 已经有任务
+        t = MyThread()
+        t.start()
+    # 已经有任务,获取第一张图片
     img_path,label = check.get_img_in_src(username)
     if img_path == '' or label == '':
         return ''
     img_stream = return_img_stream(img_path)
     return jsonify({'img_stream': str(img_stream),'img_path':img_path,'label':label})
+
+class MyThread(threading.Thread):
+    def run(self):
+        if lock.acquire():
+            print("邮箱前缀为" + username)
+            sample.get_task_by_person(person_img_num, username)
+            lock.release()
 
 # 图片判定
 @app.route('/check',methods=['POST'])
