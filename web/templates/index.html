@@ -1,0 +1,286 @@
+﻿﻿<html>
+<head>
+    <meta charset="UTF-8">
+    <!-- import CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css"/>
+    <link rel="stylesheet" type="text/css" href="font_icon/iconfont.css">
+    <!-- 生产环境版本，优化了尺寸和速度 -->
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://unpkg.com/qs/dist/qs.js"></script>
+    <!-- <script src="http://echarts.baidu.com/build/dist/echarts.js"></script> -->
+</head>
+<body>
+<div id="app">
+    <!-- 流水信息 -->
+    <el-dialog style="height:800px;" title="流水信息" :visible.sync="innerVisible" append-to-body>
+        <template>
+            <el-form :model="form" ref="form" label-width="100px" class="demo-ruleForm">
+                <el-form-item label="邮箱前缀" prop="email" :rules="[
+      { required: true, message: '邮箱前缀不能为空'}
+    ]">
+                    <el-input type="text" v-model="form.email" autocomplete="off"></el-input>
+                </el-form-item>
+                <el-form-item>
+                    <el-button type="primary" @click="submitForm('form')">提交</el-button>
+                    <el-button @click="resetForm('form')">重置</el-button>
+                </el-form-item>
+            </el-form>
+        </template>
+    </el-dialog>
+    <el-header style="text-align: right; font-size: 12px;border-bottom: 1px solid #e5e5e5">
+        <el-row>
+            <el-col :span="2"></el-col>
+            <el-col :span="8">
+                <div class="title-font">样本人工清理</div>
+            </el-col>
+            <el-col :span="2"></el-col>
+        </el-row>
+    </el-header>
+    ﻿
+    <template v-if="img_base64!=''">
+        <el-row>
+            <el-col :span="12">
+                <div class="group-class">任务图片:</div>
+            </el-col>
+            <el-col :span="8">
+                <div class="group-class">预测结果:<p v-html="label"></p></div>
+            </el-col>
+        </el-row>
+        <div class="demo-image__placeholder">
+            <div class="block">
+                <img class="img_class" style="width:600px" :src="img_base64">
+            </div>
+        </div>
+		<el-row ﻿style="margin-top:60px ;margin-left:60px">
+			<el-col :span="5">
+			    <el-button type="primary" icon="el-icon-check" @click="check_image('good')">正确</el-button>
+			</el-col>
+			<el-col :span="6">
+			    <el-button type="primary" icon="el-icon-close" @click="check_image('bad')">错误</el-button>
+			</el-col>
+		</el-row>
+    </template>
+    <template>
+        <el-row>
+            <el-col :span="12">
+                <div class="group-class"><p v-html="warning_info"></p></div>
+            </el-col>
+        </el-row>
+    </template>
+</div>
+</body>
+
+<!-- import Vue before Element -->
+
+<script src="https://unpkg.com/vue/dist/vue.js"></script>
+<!-- import JavaScript -->
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<script src="font_icon/iconfont.js"></script>
+<script>
+		new Vue({
+			el: '#app',
+			data: {
+				innerVisible: true,
+				form: {
+					email: ''
+				},
+				//图片base64
+				img_base64:'',
+				//图片路径
+				img_src:'',
+				//标签
+				label:'',
+				host: 'http://127.0.0.1:8080',
+				warning_info:''
+			},
+			created: function() {
+			},
+			filters: {
+
+			},
+			mounted() {
+				// this.drawLine();
+			},
+			methods: {
+				submitForm(form) {
+					this.$refs[form].validate((valid) => {
+						if (valid) {
+							var email = this.form.email
+							this.start(email)
+						} else {
+							console.log('error submit!!');
+							return false;
+						}
+					});
+				},
+				resetForm(form) {
+					this.$refs[form].resetFields();
+				},
+				handleSizeChange(val) {
+					this.pageSize = val;
+					this.getAnalysisListBySelect();
+				},
+				handleCurrentChange(val) {
+					this.currentPage = val;
+					this.getAnalysisListBySelect();
+				},
+				handleSizeChange1(val) {
+					this.pageSize1 = val;
+					this.getNotTypeList();
+				},
+				handleCurrentChange1(val) {
+					this.currentPage1 = val;
+					this.getNotTypeList();
+				},
+				resetDateFilter() {
+					this.$refs.filterTable.clearFilter('date');
+				},
+				clearFilter() {
+					this.$refs.filterTable.clearFilter();
+				},
+				filterTag(value, row) {
+					return row.tag === value;
+				},
+				filterHandler(value, row, column) {
+					const property = column['property'];
+					return row[property] === value;
+				},
+				formatter1(row, column) {
+					if (row.type == 0) {
+						//消费
+						return "支出";
+					} else {
+						return "收入";
+					}
+				},
+				formatter(row, column) {
+					return row.monthRadio * 100 + '%';
+				},
+				formatterMoney(row, column, cellValue, index) {
+					var number = cellValue;
+					if (isNaN(number) || number == "") return "";
+					number = Math.round(number * 100) / 100;
+					if (number < 0)
+						return '¥-' + this.outputdollars(Math.floor(Math.abs(number) - 0) + '') + this.outputcents(Math.abs(number) - 0);
+					else
+						return '¥' + this.outputdollars(Math.floor(number - 0) + '') + this.outputcents(number - 0);
+				},
+				//格式化金额
+				outputdollars(number) {
+					if (number.length <= 3)
+						return (number == '' ? '0' : number);
+					else {
+						var mod = number.length % 3;
+						var output = (mod == 0 ? '' : (number.substring(0, mod)));
+						for (i = 0; i < Math.floor(number.length / 3); i++) {
+							if ((mod == 0) && (i == 0))
+								output += number.substring(mod + 3 * i, mod + 3 * i + 3);
+							else
+								output += ',' + number.substring(mod + 3 * i, mod + 3 * i + 3);
+						}
+						return (output);
+					}
+				},
+				outputcents(amount) {
+					amount = Math.round(((amount) - Math.floor(amount)) * 100);
+					return (amount < 10 ? '.0' + amount : '.' + amount);
+				},
+				cleanCondition() {
+					this.getAnalysisListByPage();
+					this.radio = '1';
+					this.tranType = '';
+				},
+				//开始任务
+				start(username) {
+					debugger;
+					var _this = this;
+					var url = _this.host + '/start?username=' + username;
+					axios.get(url, {
+							timeout: 10000 * 20
+						})
+						.then(function(response) {
+							var data = response.data;
+							_this.innerVisible =false;
+							if (data == '') {
+							_this.warning_info = '恭喜你，你的任务已完成'
+								return;
+							}
+							_this.img_base64 = "data:image/png;base64," + data.img_stream;
+							_this.img_src = data.img_path;
+							_this.label = data.label;
+						}).catch(() => {
+							_this.$message({
+								type: 'error',
+								message: '无法获取任务'
+							});
+						});
+
+				},
+				//验证图片
+				check_image(type) {
+					var _this = this;
+					var img_src = _this.img_src;
+					var email = _this.form.email;
+					var form = {
+						"type": type,
+						"img_path": img_src,
+						"username":email
+					};
+					axios.post(_this.host + '/check', form, {
+							'Content-Type': 'application/json'
+						})
+						.then(function(response) {
+							var data = response.data;
+							if(data=='ok'){
+							    _this.start(email)
+							}
+						}).catch(() => {
+							_this.$message({
+								type: 'error',
+								message: '选择失败'
+							});
+						});
+		﻿			}
+
+			}
+		})
+
+
+
+
+</script>
+<style>
+		.block {
+			margin-bottom: 10px;
+			margin-left: 40px;
+			margin-top: 50px;
+		}
+
+		.el-header {
+			color: #333;
+			line-height: 60px;
+		}
+
+		.el-aside {
+			color: #333;
+		}
+
+		.title-font {
+			float: left;
+			font-family: Microsoft YaHei;
+			font-size: 25px;
+		}
+
+		.group-class {
+			font-family: Microsoft YaHei;
+			font-size: 20px;
+			margin-top: 30px;
+			margin-left: 15px;
+			margin-bottom: 30px;
+		}
+
+
+
+</style>
+</html>
