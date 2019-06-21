@@ -7,7 +7,7 @@ from main import sample
 from main import check
 import json
 app = Flask(__name__,root_path="web")
-person_img_num = 10
+person_img_num = 2000
 logger = logging.getLogger("WebServer")
 lock = threading.Lock()
 
