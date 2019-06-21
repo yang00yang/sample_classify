@@ -63,16 +63,20 @@
                     </el-col>
                     <el-col :span="8">
                         <div class="group-class">预测结果:<p v-html="label"></p>
-                            <el-button type="primary" icon="el-icon-check" @click="check_image('good')">正确</el-button>
-                            <el-button type="primary" icon="el-icon-close" @click="check_image('bad')">错误</el-button>
+                            <el-button type="success" icon="el-icon-check" @click="check_image('good')">正确</el-button>
+                            <el-button type="danger" icon="el-icon-close" @click="check_image('bad')">错误</el-button>
                         </div>
                         <div class="group-class">
                             <el-alert
                                     title="样本过滤说明"
-                                    type="success"
+                                    type="info"
                                     effect="dark"
-                                    description="1.匹配完全正确才算正确，模棱两可或者字数不全的都为错误。2.预计需要2小时，可以关闭，下次继续。3。辛苦辛苦"
                                     show-icon>
+                                <template slot='title'>
+                                    <div>1.匹配完全正确才算正确，模棱两可或者字数不全的都为错误。</div>
+                                    <div>2.预计需要2小时，可以关闭，下次继续。</div>
+                                    <div>3.辛苦辛苦</div>
+                                </template>
                             </el-alert>
                         </div>
                     </el-col>

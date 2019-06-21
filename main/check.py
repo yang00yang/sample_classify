@@ -82,11 +82,9 @@ def get_img_in_src(user_name):
     txt_path = os.path.join('%s%s%s' % (user_path,'/',txt_name))
     img_txt = open(txt_path, 'r')
     lines = img_txt.readlines()  # 读取所有行
-    print("还剩" + str(len(lines)) + "行")
     if len(lines)-1 <= 0 :
         return '','',0
     first_line = lines[0].split()  # 取第一行
-    print(str(lines[0]))
     img_name = first_line[0]
     label = first_line[1]
     # 图片

@@ -33,24 +33,31 @@ def return_img_stream(img_local_path):
 # 开始任务
 @app.route('/start',methods=['GET'])
 def start():
-    global username
     username = request.args['username']
     if check.get_status(username) == 0:
         # 没有领任务
-        t = MyThread()
+        t = MyThread(username)
         t.start()
+        t.join()
     # 已经有任务,获取第一张图片
+    print("邮箱前缀为" + username + "，开始获取第一张图片")
     img_path,label,remain = check.get_img_in_src(username)
     if img_path == '' or label == '':
         return ''
     img_stream = return_img_stream(img_path)
+    print("邮箱前缀为" + username + "的图片获取成功")
     return jsonify({'img_stream': str(img_stream),'img_path':img_path,'label':label,'remain':remain})
 
 class MyThread(threading.Thread):
+    def __init__(self,args):
+        threading.Thread.__init__(self)
+        self.args = args
     def run(self):
         if lock.acquire():
-            print("邮箱前缀为" + username)
-            sample.get_task_by_person(person_img_num, username)
+            print("邮箱前缀为" + self.args + "的任务开始执行")
+            # time.sleep(3)
+            sample.get_task_by_person(person_img_num, self.args)
+            print("邮箱前缀为" + self.args + "的任务获取成功")
             lock.release()
 
 # 图片判定

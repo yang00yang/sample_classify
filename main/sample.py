@@ -27,7 +27,6 @@ def get_task_by_person(person_img_num,user_name):
     lines = img_txt.readlines()  # 读取所有行
     label = ''
     for i in range(person_img_num):
-        print("这一行的数据为" + lines[i])
         label = label + lines[i]
     lines = lines[person_img_num:]
     # 将该图片和label写入该用户的文件夹
@@ -40,7 +39,6 @@ def get_task_by_person(person_img_num,user_name):
 
 # 将该label写入该用户的文件夹
 def write_label_to_newfile(label,user_name):
-    print("label为"+ label)
     new_path = os.path.join('%s%s' % (person_path, user_name))
     logger.info("邮箱前缀为" + user_name + "的用户的文件路径为" + new_path)
     if not os.path.isdir(new_path):
