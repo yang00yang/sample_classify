@@ -54,6 +54,8 @@
             <template v-if="img_base64!=''&&warning_info==''">
                 <el-row>
                     <el-col :span="15">
+                        <div class="group-class">预测结果:<p v-html="label" class="title-font3"></p>
+                        </div>
                         <div class="group-class">任务图片:</div>
                         <div class="demo-image__placeholder">
                             <div class="block">
@@ -62,7 +64,7 @@
                         </div>
                     </el-col>
                     <el-col :span="8">
-                        <div class="group-class">预测结果:<p v-html="label"></p>
+                        <div class="group-class">
                             <el-button type="success" icon="el-icon-check" @click="check_image('good')">正确</el-button>
                             <el-button type="danger" icon="el-icon-close" @click="check_image('bad')">错误</el-button>
                         </div>
@@ -310,6 +312,12 @@
 			font-family: Microsoft YaHei;
 			font-size: 30px;
 			text-align: center;
+			color:blue;
+		}
+
+		.title-font3 {
+			font-family: Microsoft YaHei;
+			font-size: 30px;
 			color:blue;
 		}
 

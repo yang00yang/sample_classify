@@ -27,6 +27,7 @@ def get_task_by_person(person_img_num,user_name):
     lines = img_txt.readlines()  # 读取所有行
     label = ''
     for i in range(person_img_num):
+        print(str(i))
         label = label + lines[i]
     lines = lines[person_img_num:]
     # 将该图片和label写入该用户的文件夹
@@ -46,7 +47,7 @@ def write_label_to_newfile(label,user_name):
     # 用户对应的txt
     user_txt_name = os.path.join('%s%s' % (user_name,".txt"))
     user_txt = os.path.join('%s%s%s' % (new_path ,"/",user_txt_name))
-    fopen = open(user_txt, 'a+')
+    fopen = open(user_txt, 'w+')
     write_txt = label
     fopen.write('%s%s' % (write_txt, os.linesep))
     fopen.close()

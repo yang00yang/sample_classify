@@ -24,10 +24,17 @@ def init_logger():
 # 得到用户目前的状态
 def get_status(user_name):
     user_path = os.path.join('%s%s' % (person_path,user_name))
+    txt_path = os.path.join('%s%s%s%s' % (user_path,'/',user_name,'.txt'))
     if not os.path.isdir(user_path):
         return 0
     else:
-        return 1
+        file = open(txt_path, 'r')
+        lines = file.readlines()  # 读取所有行
+        print(user_name+"的文件还剩" + str(len(lines)) + "行")
+        if len(lines)-1 <=0:
+            return 0
+        else:
+            return 1
 
 
 # 如果正确的图片移到good下，错误的图片移到bad下
@@ -82,6 +89,7 @@ def get_img_in_src(user_name):
     txt_path = os.path.join('%s%s%s' % (user_path,'/',txt_name))
     img_txt = open(txt_path, 'r')
     lines = img_txt.readlines()  # 读取所有行
+    print("用户"+user_name + "还剩" + str(len(lines)))
     if len(lines)-1 <= 0 :
         return '','',0
     first_line = lines[0].split()  # 取第一行
